@@ -4,30 +4,38 @@ require "db.php";
 
 $error = "";
 
+// Kontrola odeslání formuláře
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $username = trim($_POST["username"]);
+    $email = trim($_POST["email"]);
     $password = $_POST["password"];
     $password_confirm = $_POST["password_confirm"];
 
+    // Validace hesel
     if ($password !== $password_confirm) {
         $error = "Hesla se neshodují.";
-    } elseif (!preg_match('/^[a-zA-Z0-9]+$/', $username)) {
-        $error = "Username může obsahovat pouze písmena a čísla.";
     } else {
-        $check = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-        $check->execute([$username]);
+        // Kontrola, zda uživatel nebo email už existuje
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+        $stmt->execute([$username, $email]);
+        $existing = $stmt->fetch();
 
-        if ($check->rowCount() > 0) {
-            $error = "Tento username už existuje.";
+        if ($existing) {
+            $error = "Uživatel nebo email již existuje.";
         } else {
-            $hash = password_hash($password, PASSWORD_DEFAULT);
+            // Hash hesla
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            $insert = $pdo->prepare("INSERT INTO users (username, password) VALUES (?, ?)");
-            $insert->execute([$username, $hash]);
-
-            header("Location: login.php?registered=1");
-            exit;
+            // Vložení do databáze
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
+            if ($stmt->execute([$username, $email, $hashed_password])) {
+                // Přesměrování na login po úspěšné registraci
+                header("Location: login.php");
+                exit;
+            } else {
+                $error = "Chyba při registraci, zkuste to znovu.";
+            }
         }
     }
 }
@@ -39,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrace</title>
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/profile.css">
 </head>
 <body>
     <main>
@@ -61,31 +69,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         <!-- USERNAME -->
                         <div class="form-main-inputs">
                             <div class="form-main-inputs-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-                                </svg>
                                 <label>Username</label>
                             </div>
-                            <input name="username" type="text" placeholder="Username (alphanumeric only)" required>
+                            <input name="username" type="text" placeholder="Enter your username" required>
+                        </div>
+
+                        <!-- EMAIL -->
+                        <div class="form-main-inputs">
+                            <div class="form-main-inputs-label">
+                                <label>Email</label>
+                            </div>
+                            <input name="email" type="email" placeholder="Enter your email" required>
                         </div>
 
                         <!-- PASSWORD -->
                         <div class="form-main-inputs">
                             <div class="form-main-inputs-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                                </svg>
                                 <label>Password</label>
                             </div>
-                            <input name="password" type="password" placeholder="Enter your password (min 6 characters)" required minlength="6">
+                            <input name="password" type="password" placeholder="Enter your password" required minlength="6">
                         </div>
 
-                        <!-- CONFIRM -->
+                        <!-- CONFIRM PASSWORD -->
                         <div class="form-main-inputs">
                             <div class="form-main-inputs-label">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
-                                </svg>
                                 <label>Confirm Password</label>
                             </div>
                             <input name="password_confirm" type="password" placeholder="Confirm your password" required>
@@ -94,12 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     </div>
 
                     <div class="form-buttons">
-                        <button type="submit">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
-                            </svg>
-                            Create Account
-                        </button>
+                        <button type="submit">Create Account</button>
                     </div>       
                 </form>
 

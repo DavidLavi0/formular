@@ -1,0 +1,169 @@
+/* Reset a základní nastavení */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: rgba(22, 23, 29, 0.95);
+    min-width: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+section {
+    padding: 21px;
+}
+
+svg {
+    width: 21px;
+}
+
+/* Form Container */
+.form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    flex-direction: column;
+    background-color: rgba(22, 23, 29, 0.95);
+    color: white;
+    max-width: 550px;
+    margin: 0 auto;
+    border-radius: 1rem;
+    padding: 3rem;
+    border: 1px solid #434355;
+}
+
+/* Form Header */
+.form-header {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 21px;
+}
+
+.form-header img {
+    width: 80px;
+    height: auto;
+}
+
+/* Form Styling */
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 21px;
+    transition: ease 0.3s;
+}
+
+.form-main {
+    display: flex;
+    flex-direction: column;
+    gap: 21px;
+    margin-top: 21px;
+}
+
+.form-main-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-main-inputs-label {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 5px;
+}
+
+.form-main-inputs-label svg {
+    stroke: #932929;
+}
+
+/* Input Styles */
+input {
+    width: 100%;
+    padding: 12px;
+    background: #2a2b35;
+    border: 1px solid #434355;
+    border-radius: 0.5rem;
+    color: white;
+    transition: ease 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border: 1px solid #932929;
+}
+
+/* Button Styles */
+button {
+    background-color: #f25a5a;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 0.5rem;
+    transition: ease 0.3s;
+    font-weight: 600;
+}
+
+button:hover {
+    background-color: #932929;
+    cursor: pointer;
+}
+
+/* Footer Styling */
+.form-footer {
+    padding: 21px;
+    border-top: 1px solid #434355;
+    width: 100%;
+    margin-top: 21px;
+}
+
+.form-footer a {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #932929;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 0.5rem;
+    border: 1px solid #434355;
+    text-decoration: none;
+    transition: ease 0.3s;
+}
+
+.form-footer a span {
+    color: rgba(255, 255, 255, 0.579);
+}
+
+.form-footer a:hover {
+    color: white;
+}
+    
+/* Responsivní */
+@media (max-width: 600px) {
+    .form {
+        padding: 2rem;
+    }
+}

@@ -108,7 +108,7 @@ svg{
             background: #2a2b35;
             border: 1px solid #434355;
             border-radius: 0.5rem;
-            color: #ff00e1;
+            color: white;
             transform: ease .3s;
         }
 
@@ -167,4 +167,19 @@ svg{
             color: white;
         }
     }
+}
+
+.form-main-inputs input {
+    width: 100%;
+    padding: 12px;
+    background: #2a2b35;
+    border: 1px solid #434355;
+    border-radius: 0.5rem;
+    color: white;
+    transition: ease .3s;
+}
+
+.form-main-inputs input:focus {
+    outline: none;
+    border: 1px solid #932929;
 }

@@ -1,24 +1,29 @@
 <?php
 session_start();
-require "db.php";
+require "db.php"; // Připojení k databázi
 
-$error = "";
+$error = ""; // Proměnná pro chybové hlášení
 
+// Zpracování formuláře při odeslání
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $username = $_POST["username"];
+    // Získání hodnot z formuláře
+    $login = $_POST["login"];  // login = buď uživatelské jméno nebo email
     $password = $_POST["password"];
 
-    $q = $pdo->prepare("SELECT * FROM users WHERE username = ?");
-    $q->execute([$username]);
-    $user = $q->fetch();
+    // SQL dotaz pro ověření uživatele podle uživatelského jména nebo emailu
+    $q = $pdo->prepare("SELECT * FROM users WHERE username = ? OR email = ?");
+    $q->execute([$login, $login]);  // Prohledáme jak uživatelské jméno, tak email
+    $user = $q->fetch(); // Vyhledáme odpovídajícího uživatele
 
+    // Kontrola, jestli uživatel existuje a heslo je správné
     if (!$user || !password_verify($password, $user["password"])) {
-        $error = "Špatné přihlašovací údaje.";
+        $error = "Špatné přihlašovací údaje.";  // Chybová zpráva
     } else {
+        // Pokud přihlášení proběhne úspěšně, uložíme uživatelské jméno do session
         $_SESSION["user"] = $user["username"];
-        header("Location: index.php");
-        exit;
+        header("Location: index.php");  // Přesměrování na hlavní stránku
+        exit;  // Zastavení dalšího vykonávání skriptu
     }
 }
 ?>
@@ -29,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Přihlášení</title>
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/login.css">
 </head>
 <body>
 
@@ -41,25 +46,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <h2>Sign in</h2>
             </div>
 
+            <!-- Zobrazí chybovou zprávu, pokud nastane problém s přihlášením -->
             <?php if ($error): ?>
-                <p style="color:red;"><?= $error ?></p>
+                <p class="msg-error"><?= $error ?></p>
             <?php endif; ?>
 
+            <!-- Přihlašovací formulář -->
             <form method="POST">
                 <div class="form-main">
 
-                    <!-- USERNAME -->
+                    <!-- Login (uživatelské jméno nebo email) -->
                     <div class="form-main-inputs">
                         <div class="form-main-inputs-label">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
                             </svg>
-                            <label>Username</label>
+                            <label>Username or Email</label>
                         </div>
-                        <input name="username" type="text" placeholder="Enter your username" required>
+                        <input name="login" type="text" placeholder="Enter your username or email" required>
                     </div>
 
-                    <!-- PASSWORD -->
+                    <!-- Heslo -->
                     <div class="form-main-inputs">
                         <div class="form-main-inputs-label">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -72,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 </div>
 
+                <!-- Tlačítko pro odeslání formuláře -->
                 <div class="form-buttons">
                     <button type="submit">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
@@ -82,6 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </div>
             </form>
 
+            <!-- Odkaz na stránku pro registraci -->
             <div class="form-footer">
                 <a href="register.php">
                     <span>Nemáš účet?</span>
