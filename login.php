@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         // Pokud přihlášení proběhne úspěšně, uložíme uživatelské jméno do session
         $_SESSION["user"] = $user["username"];
-        header("Location: index.php");  // Přesměrování na hlavní stránku
+        header("Location: profile.php");  // Přesměrování na hlavní stránku
         exit;  // Zastavení dalšího vykonávání skriptu
     }
 }
